@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotto Number Generator</title>
+    <title>로또 번호 생성기</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Lotto Number Generator</h1>
+        <h1>로또 번호 생성기</h1>
         <p>1부터 45까지 중복 없이 6개 번호를 뽑습니다.</p>
 
         <div class="controls">
@@ -16,6 +16,7 @@
             <input id="count" type="number" min="1" max="10" value="1" />
             <button id="generate-btn">번호 생성</button>
             <button id="clear-btn" type="button">초기화</button>
+            <button id="theme-btn" type="button" aria-pressed="false">다크 모드</button>
         </div>
 
         <div id="lotto-numbers" class="lotto-numbers"></div>
@@ -25,6 +26,8 @@
         const generateBtn = document.getElementById("generate-btn");
         const clearBtn = document.getElementById("clear-btn");
         const countInput = document.getElementById("count");
+        const themeBtn = document.getElementById("theme-btn");
+        const STORAGE_KEY = "lotto-theme";
 
         function generateLottoSet() {
             const numbers = new Set();
@@ -74,6 +77,32 @@
         clearBtn.addEventListener("click", () => {
             lottoNumbersEl.innerHTML = "";
         });
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+            const isDark = theme === "dark";
+            themeBtn.textContent = isDark ? "화이트 모드" : "다크 모드";
+            themeBtn.setAttribute("aria-pressed", String(isDark));
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved === "dark" || saved === "light") {
+                applyTheme(saved);
+                return;
+            }
+            const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            applyTheme(prefersDark ? "dark" : "light");
+        }
+
+        themeBtn.addEventListener("click", () => {
+            const current = document.documentElement.getAttribute("data-theme") || "light";
+            const next = current === "dark" ? "light" : "dark";
+            applyTheme(next);
+            localStorage.setItem(STORAGE_KEY, next);
+        });
+
+        initTheme();
     </script>
 </body>
 </html>
