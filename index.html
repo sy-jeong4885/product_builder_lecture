@@ -9,9 +9,71 @@
 <body>
     <div class="container">
         <h1>Lotto Number Generator</h1>
+        <p>1부터 45까지 중복 없이 6개 번호를 뽑습니다.</p>
+
+        <div class="controls">
+            <label for="count">세트 개수</label>
+            <input id="count" type="number" min="1" max="10" value="1" />
+            <button id="generate-btn">번호 생성</button>
+            <button id="clear-btn" type="button">초기화</button>
+        </div>
+
         <div id="lotto-numbers" class="lotto-numbers"></div>
-        <button id="generate-btn">Generate Numbers</button>
     </div>
-    <script src="main.js"></script>
+    <script>
+        const lottoNumbersEl = document.getElementById("lotto-numbers");
+        const generateBtn = document.getElementById("generate-btn");
+        const clearBtn = document.getElementById("clear-btn");
+        const countInput = document.getElementById("count");
+
+        function generateLottoSet() {
+            const numbers = new Set();
+            while (numbers.size < 6) {
+                const n = Math.floor(Math.random() * 45) + 1;
+                numbers.add(n);
+            }
+            return Array.from(numbers).sort((a, b) => a - b);
+        }
+
+        function renderSets(sets) {
+            lottoNumbersEl.innerHTML = "";
+            sets.forEach((set, idx) => {
+                const row = document.createElement("div");
+                row.className = "lotto-row";
+                const label = document.createElement("div");
+                label.className = "lotto-label";
+                label.textContent = `${idx + 1}번째`;
+
+                const balls = document.createElement("div");
+                balls.className = "lotto-balls";
+
+                set.forEach((num) => {
+                    const ball = document.createElement("span");
+                    ball.className = "lotto-ball";
+                    ball.dataset.range =
+                        num <= 10 ? "1" : num <= 20 ? "2" : num <= 30 ? "3" : num <= 40 ? "4" : "5";
+                    ball.textContent = num;
+                    balls.appendChild(ball);
+                });
+
+                row.appendChild(label);
+                row.appendChild(balls);
+                lottoNumbersEl.appendChild(row);
+            });
+        }
+
+        generateBtn.addEventListener("click", () => {
+            const count = Math.min(Math.max(parseInt(countInput.value || "1", 10), 1), 10);
+            const sets = [];
+            for (let i = 0; i < count; i += 1) {
+                sets.push(generateLottoSet());
+            }
+            renderSets(sets);
+        });
+
+        clearBtn.addEventListener("click", () => {
+            lottoNumbersEl.innerHTML = "";
+        });
+    </script>
 </body>
 </html>
